@@ -1,0 +1,31 @@
+{
+  "name": "ncc-app-server",
+  "version": "1.0.0",
+  "description": "ncc emea web app server application",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohammedafeef/ncc-app-server.git"
+  },
+  "keywords": [
+    "nccemea",
+    "emea",
+    "ncc"
+  ],
+  "author": "afeef",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mohammedafeef/ncc-app-server/issues"
+  },
+  "homepage": "https://github.com/mohammedafeef/ncc-app-server#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "nodemon": "^2.0.15"
+  }
+}
