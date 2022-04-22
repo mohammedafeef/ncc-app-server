@@ -6,7 +6,7 @@ const { NotFound, BadRequest } = require("../utils/errors");
 const responseMessages = require("../utils/responseMessages");
 
 //Register a new User
-async function registerUser(req, res) {
+async function registerUser(req, res, next) {
   try {
     const { username, email, password, code } = req.body;
     if (
@@ -32,9 +32,9 @@ async function registerUser(req, res) {
     const registerCridentails = {
       username,
       email,
-      hash,
     };
-    const registeredUser = await authService.createUser(registerCridentails);
+    registerCridentails.password = hash;
+    const registeredUser = await authService.registerUser(registerCridentails);
     res.send(registeredUser);
   } catch (err) {
     next(err);
@@ -50,13 +50,13 @@ async function loginUser(req, res, next) {
     }
 
     //Check if the user exits
-    const user = await authService.checkUserExists(username);
+    const user = await authService.getUserByUsername(username);
     if (!user) {
       return next(new NotFound(responseMessages.INVALID_LOGIN_DATA));
     }
 
     //Check if the password is correct
-    const isMatch = await bcrypt.compare(password, user.hash);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return next(new BadRequest(responseMessages.INVALID_LOGIN_DATA));
     }

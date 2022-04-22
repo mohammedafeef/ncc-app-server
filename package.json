@@ -4,7 +4,8 @@
   "description": "ncc emea web app server application",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon index.js"
+    "test": "nodemon ./src/index.js",
+    "start": "node ./src/index.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "firebase-admin": "^10.0.2",
+    "multer": "^1.4.4",
     "nodemon": "^2.0.15"
   }
 }

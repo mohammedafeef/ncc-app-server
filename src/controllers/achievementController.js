@@ -1,19 +1,19 @@
 const { BadRequest, NotFound } = require("../utils/errors");
 const responseMessages = require("../utils/responseMessages");
 const { bucket } = require("../helpers/firebaseClient");
-const eventService = require("../services/eventService");
+const achivementService = require("../services/achievementService");
 const ImageUploadService = require("../services/imageUploadService");
 //get all the events
-async function getAllEvents(req, res, next) {
+async function getAllAchievements(req, res, next) {
   try {
-    const events = await eventService.getAllEvents();
-    res.send(events);
+    const achievements = await achivementService.getAllAchievements();
+    res.send(achievements);
   } catch (err) {
     next(err);
   }
 }
 //get a event details
-async function getEventById(req, res, next) {
+async function getAchievementById(req, res, next) {
   try {
     const { id } = req.params;
     if (!id) {
@@ -21,30 +21,28 @@ async function getEventById(req, res, next) {
     }
 
     //get event details from database
-    const event = await eventService.getEventById(id);
-    if (!event) {
+    const achievement = await achivementService.getAchievementById(id);
+    if (!achievement) {
       return next(new NotFound(responseMessages.EVENT_NOT_FOUND));
     }
-    res.send(event);
+    res.send(achievement);
   } catch (err) {
     next(err);
   }
 }
 
 //To add new event
-async function addEvent(req, res, next) {
+async function addAchievement(req, res, next) {
   try {
-    const { name, description, date } = req.body;
-    if (!name || !description || !date) {
+    const { title } = req.body;
+    if (!title) {
       return next(new BadRequest(responseMessages.INVALID_REQUEST));
     }
-    const eventData = {
-      name,
-      description,
-      date
-    }
+    const achievementData = {
+      title,
+    };
     //add event to database
-    const event = await eventService.addEvent(eventData);
+    const event = await achivementService.addAchievement(achievementData);
     res.send(event);
   } catch (err) {
     next(err);
@@ -52,7 +50,7 @@ async function addEvent(req, res, next) {
 }
 
 //Update a event details
-async function updateEvent(req, res, next) {
+async function updateAchievement(req, res, next) {
   try {
     const { id } = req.params;
     const eventUpdates = req.body;
@@ -60,14 +58,17 @@ async function updateEvent(req, res, next) {
       return next(new BadRequest(responseMessages.INVALID_REQUEST));
     }
     //update event details in database
-    const event = await eventService.updateEvent(id, eventUpdates);
+    await achivementService.updateAchievement(
+      id,
+      eventUpdates
+    );
     res.send(responseMessages.EVENT_UPDATED);
   } catch (err) {
     next(err);
   }
 }
 //Delete a event
-async function deleteEvent(req, res, next) {
+async function deleteAchievement(req, res, next) {
   try {
     const { id } = req.params;
     if (!id) {
@@ -75,14 +76,14 @@ async function deleteEvent(req, res, next) {
     }
 
     //delete event from database
-    await eventService.deleteEvent(id);
+    await achivementService.deleteAchievement(id);
     res.send(responseMessages.EVENT_DELETED);
   } catch (err) {
     next(err);
   }
 }
 //upload event images
-async function uploadEventImage(req, res, next) {
+async function uploadAchievementImage(req, res, next) {
   try {
     const { id } = req.params;
     const image = req.file;
@@ -91,31 +92,31 @@ async function uploadEventImage(req, res, next) {
     }
 
     //check this event exists
-    const event = await eventService.getEventById(id);
+    const event = await achivementService.getAchievementById(id);
     if (!event) {
       return next(new BadRequest(responseMessages.INVALID_REQUEST));
     }
 
     //upload image to firebase storage
-    const blob = bucket.file(`images/event/${id}`);
+    const blob = bucket.file(`images/achivement/${id}`);
     const imageUrl = await ImageUploadService.uploadImage(blob, image);
     //update imageurl event collection
-    const updatedEventData = {
+    const updatedAchievementData = {
       ...event,
       image: imageUrl,
     };
-    await eventService.updateEvent(id, updatedEventData);
-    res.send(updatedEventData);
+    await achivementService.updateAchievement(id, updatedAchievementData);
+    res.send(updatedAchievementData);
   } catch (err) {
     next(err);
   }
 }
 
 module.exports = {
-  getAllEvents,
-  getEventById,
-  addEvent,
-  updateEvent,
-  deleteEvent,
-  uploadEventImage,
+  getAllAchievements,
+  getAchievementById,
+  addAchievement,
+  updateAchievement,
+  deleteAchievement,
+  uploadAchievementImage,
 };
