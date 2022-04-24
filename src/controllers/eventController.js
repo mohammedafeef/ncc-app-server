@@ -41,8 +41,8 @@ async function addEvent(req, res, next) {
     const eventData = {
       name,
       description,
-      date
-    }
+      date,
+    };
     //add event to database
     const event = await eventService.addEvent(eventData);
     res.send(event);
@@ -110,6 +110,34 @@ async function uploadEventImage(req, res, next) {
     next(err);
   }
 }
+async function uploadDocFile(req, res, next) {
+  try {
+    const { id } = req.params;
+    const image = req.file;
+    if (!id || !image) {
+      return next(new BadRequest(responseMessages.INVALID_REQUEST));
+    }
+
+    //check this event exists
+    const event = await eventService.getEventById(id);
+    if (!event) {
+      return next(new BadRequest(responseMessages.INVALID_REQUEST));
+    }
+
+    //upload image to firebase storage
+    const blob = bucket.file(`doc/event/${id}`);
+    const docUrl = await ImageUploadService.uploadImage(blob, image);
+    //update imageurl event collection
+    const updatedEventData = {
+      ...event,
+      doc: docUrl,
+    };
+    await eventService.updateEvent(id, updatedEventData);
+    res.send(updatedEventData);
+  } catch (err) {
+    console.error(err.message);
+  }
+}
 
 module.exports = {
   getAllEvents,
@@ -118,4 +146,5 @@ module.exports = {
   updateEvent,
   deleteEvent,
   uploadEventImage,
+  uploadDocFile
 };
